@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  fxce-colosseum:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2021-11-26T10:42:55.674132+07:00"
+    description: A Helm chart for Kubernetes
+    digest: 7af740232e2557c00db5c712202e56451a5be4ba86bd0887cbe85914bacf6865
+    name: fxce-colosseum
+    type: application
+    urls:
+    - fxce-colosseum-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-11-26T10:42:55.669452+07:00"

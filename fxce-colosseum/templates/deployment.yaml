@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  labels: 
+    app.kubernetes.io/managed-by: "Heml"
+    app: {{ .Values.name }}
+    run: {{ .Values.name}}
+    {{if .Values.group}}
+    group: {{ .Values.group }}
+    {{- end}}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+      run: {{ .Values.name }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ .Values.name }}
+        run: {{ .Values.name }}
+        app.kubernetes.io/instance: {{ .Values.name }}
+        app.kubernetes.io/name: {{ .Values.name }}
+         {{if .Values.group}}
+        group: {{ .Values.group }}
+        {{- end}}
+    spec:
+    # init container
+      initContainers:
+      # {{- if .Values.initSSL.enabled }}
+      # - name: init-ssl-cert
+      #   image: "{{ .Values.initSSL.image}}:{{.Values.initSSL.imageTag}}"
+      #   imagePullPolicy: {{ .Values.initSSL.imagePullPolicy }}
+      #   command:
+      #   - /bin/bash
+      #   - -c
+      #   volumeMounts:
+      #   - name: selfcert
+      #     mountPath: /var/tmp/cert.crt
+      #     subPath: cert.crt
+      #     readOnly: false
+      #   - mountPath: /tmp/
+      #     name: ssl-certs
+      # {{- end }}
+      {{- if .Values.kuberesolver.enabled }}
+      serviceAccountName: {{ .Values.kuberesolver.name }}
+      {{- end }}
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+{{ toYaml .Values.imagePullSecrets | indent 8 }}
+      {{- end }}
+
+      containers:   
+# container image for deployment
+        - name: {{ .Values.name }}
+          image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag}}
+          imagePullPolicy: {{.Values.image.pullPolicy}}
+          ports:
+            {{if .Values.grpcPort }}
+            - containerPort: {{ .Values.tcpPort }}
+              name: tcp
+            {{- end}}
+            - containerPort: {{ .Values.port }}
+              name: http
+          envFrom:
+            {{- range .Values.config }}
+            - configMapRef:
+                name: {{ .name }}
+            {{- end}}
+            {{- range .Values.config }}
+            - secretRef:
+                name: {{ .name }}
+            {{- end}}
+          args:
+            - bundle update; bundle install; ATTACHED_API=1 ATTACHED_SIDEKIQ=1 rails s
+          command:
+            - /bin/bash
+            - -c
+          env:
+          - name: ATTACHED_API
+            value: "1"
+          - name: LOG_LEVEL
+            value: debug
+          env:
+            {{- range $key, $val := .Values.env}}
+            - name: {{ $key}}
+            {{- if  eq (typeOf $val) "[]interface {}" }}
+              value: {{ printf "%v" (join "," $val) | quote }}
+            {{- else if  eq (typeOf $val) "map[string]interface {}"}}
+            {{ toYaml $val | nindent 14 }}
+            {{- else }}
+              value: {{ $val | quote }}
+            {{- end }}
+            {{- end }}
+          {{- if .Values.securityContext }}
+          securityContext:
+          {{ toYaml .Values.securityContext | nindent 14 }}
+          {{- else }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {}
+            privileged: false
+          {{- end }}
+          resources:
+            {{if .Values.resources.limit }}
+            limits:
+              cpu: {{ .Values.resources.limit.cpu | default "100m"}}
+              memory: {{ .Values.resources.limit.memory | default "128Mi"}}
+            {{- end}}
+            {{if .Values.resources.requests}}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | default "100m"}}
+              memory: {{ .Values.resources.requests.memory |default "128Mi"}}
+            {{- end}}
+          
+      

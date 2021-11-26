@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  APP_NAME: RlhDRS1DT0xPU1NFVU0tVEVTVAo=
+  KAFKA_URL: c3RrazAxLWNwLWthZmthLWhlYWRsZXNzLmZ4Y2Uta2Fma2EtZGV2OjkwOTIK
+  RAILS_LOG_TO_STDOUT: dHJ1ZQo=
+  ATTACHED_API: MQo=
+  LOG_LEVEL: ZGVidWcK
+kind: ConfigMap
+metadata:
+  annotations:
+    field.cattle.io/creatorId: u-kgdta6hr7e
+  labels:
+    cattle.io/creator: norman
+  name: fxce-colosseum-env
+  namespace: colosseum-test
+  selfLink: /api/v1/namespaces/colosseum-test/configmaps/fxce-colosseum-env
