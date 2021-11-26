@@ -3,12 +3,12 @@ entries:
   fxce-colosseum:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2021-11-26T11:16:47.224388+07:00"
+    created: "2021-11-26T11:28:03.675562+07:00"
     description: A Helm chart for Kubernetes
     digest: 83f275fd34083fc3d12e1a67c3e593b01278f7b485b96e7ab10ebcd524545e42
     name: fxce-colosseum
     type: application
     urls:
-    - fxce-colosseum-0.1.0.tgz
+    - https://github.com/PrBinh/fxce-helm/tree/main/fxce-colosseum/fxce-colosseum-0.1.0.tgz
     version: 0.1.0
-generated: "2021-11-26T11:16:47.22346+07:00"
+generated: "2021-11-26T11:28:03.669894+07:00"
